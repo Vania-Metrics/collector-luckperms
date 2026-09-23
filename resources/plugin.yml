@@ -1,0 +1,18 @@
+# Métriques LuckPerms : groupes, pistes, répartition des joueurs.
+#
+# UN JAR, UNE INTÉGRATION. Le retirer retire ces métriques et rien d'autre ; s'il
+# plante, il plante seul. C'est ce que « depend » rend vrai : sans le noyau ou sans
+# LuckPerms, Bukkit ne charge pas ce plugin et le dit clairement, au lieu
+# de laisser un collecteur échouer en silence à chaque scrape.
+#
+# LA DESCRIPTION EST ENTRE GUILLEMETS, et ce n'est pas décoratif : elle contient
+# un « : » suivi d'une espace, ce qui fait d'une chaîne nue une PAIRE clé-valeur
+# pour YAML. Sans les guillemets, Paper rejette le fichier entier — « Error
+# loading plugin: Invalid plugin.yml » — sans dire lequel ni pourquoi.
+name: VaniaMetrics-LuckPerms
+version: ${version}
+main: fr.samflix.vaniametrics.module.luckperms.LuckPermsPaper
+api-version: '1.21'
+authors: [mc-vania]
+description: "Métriques LuckPerms : groupes, pistes, répartition des joueurs."
+depend: [VaniaMetrics, LuckPerms]

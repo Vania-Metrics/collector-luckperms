@@ -1,18 +1,18 @@
-# Métriques LuckPerms : groupes, pistes, répartition des joueurs.
+# LuckPerms metrics: groups, tracks, player distribution.
 #
-# UN JAR, UNE INTÉGRATION. Le retirer retire ces métriques et rien d'autre ; s'il
-# plante, il plante seul. C'est ce que « depend » rend vrai : sans le noyau ou sans
-# LuckPerms, Bukkit ne charge pas ce plugin et le dit clairement, au lieu
-# de laisser un collecteur échouer en silence à chaque scrape.
+# One jar, one integration. Removing it removes these metrics and nothing
+# else; if it crashes, it crashes alone. That's what "depend" guarantees:
+# without the core or without LuckPerms, Bukkit doesn't load this plugin and
+# says so clearly, instead of letting a collector fail silently on every scrape.
 #
-# LA DESCRIPTION EST ENTRE GUILLEMETS, et ce n'est pas décoratif : elle contient
-# un « : » suivi d'une espace, ce qui fait d'une chaîne nue une PAIRE clé-valeur
-# pour YAML. Sans les guillemets, Paper rejette le fichier entier — « Error
-# loading plugin: Invalid plugin.yml » — sans dire lequel ni pourquoi.
+# The description is quoted, and that's not decorative: it contains a ": "
+# (colon followed by a space), which turns a bare string into a YAML
+# key-value pair. Without the quotes, Paper rejects the whole file —
+# "Error loading plugin: Invalid plugin.yml" — without saying which or why.
 name: VaniaMetrics-LuckPerms
 version: ${version}
 main: fr.samflix.vaniametrics.module.luckperms.LuckPermsPaper
 api-version: '1.21'
 authors: [mc-vania]
-description: "Métriques LuckPerms : groupes, pistes, répartition des joueurs."
+description: "LuckPerms metrics: groups, tracks, player distribution."
 depend: [VaniaMetrics, LuckPerms]

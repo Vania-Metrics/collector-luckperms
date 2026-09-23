@@ -15,88 +15,90 @@ import fr.samflix.vaniametrics.api.MetricRegistry;
 import fr.samflix.vaniametrics.api.Platform;
 
 /**
- * Le relevé LuckPerms.
+ * The LuckPerms collector.
  *
- * <p>EN FOND, ET POUR UNE SEULE MÉTRIQUE : {@code getUniqueUsers()} balaie toute la table des
- * joueurs. Les groupes, eux, sont déjà en mémoire et ne coûtent rien — mais séparer ferait deux
- * collecteurs pour un même sujet, et cinq minutes de retard sur un nombre de comptes n'a jamais
- * changé une décision.
+ * <p>Backgrounded, for a single metric: {@code getUniqueUsers()} scans the whole
+ * user table. Groups are already in memory and cost nothing — but splitting
+ * would mean two collectors for one subject, and being five minutes behind on
+ * an account count never changed a decision.
  *
- * <p>ON NE COMPTE LES MEMBRES D'UN GROUPE QUE PARMI LES JOUEURS EN LIGNE, et c'est délibéré :
- * l'API n'a aucun moyen de compter les membres d'un groupe sans charger TOUS les utilisateurs, un
- * par un, depuis la base. Le chiffre global se lit en une requête SQL sur
- * {@code luckperms_user_permissions} — c'est le travail du module SQL, pas de celui-ci.
+ * <p>Group membership only counts online players, and that's deliberate: the
+ * API has no way to count a group's members without loading every user, one
+ * by one, from the database. The overall count is a single SQL query on
+ * {@code luckperms_user_permissions} — that's the sql module's job, not this
+ * one's.
  */
 public final class LuckPermsCollector implements Collector {
 
-	private final Platform plateforme;
+	private final Platform platform;
 
-	private Gauge groupes;
-	private Gauge pistes;
-	private Gauge comptes;
-	private Gauge enLigneParGroupe;
-	private Gauge poidsGroupe;
+	private Gauge groups;
+	private Gauge tracks;
+	private Gauge users;
+	private Gauge onlineByGroup;
+	private Gauge groupWeight;
 
-	public LuckPermsCollector(Platform plateforme) {
-		this.plateforme = plateforme;
+	public LuckPermsCollector(Platform platform) {
+		this.platform = platform;
 	}
 
 	@Override
-	public String nom() {
+	public String name() {
 		return "luckperms";
 	}
 
 	@Override
-	public String origine() {
+	public String source() {
 		return "LuckPerms";
 	}
 
 	@Override
-	public boolean enFond() {
+	public boolean isBackground() {
 		return true;
 	}
 
 	@Override
-	public long intervalleSecondes() {
+	public long intervalSeconds() {
 		return 300;
 	}
 
 	@Override
-	public void declarer(MetricRegistry r) {
-		groupes = r.gauge("permission_groups", "Groupes déclarés.");
-		pistes = r.gauge("permission_tracks", "Pistes de promotion déclarées.");
-		comptes = r.gauge("permission_users",
-				"Comptes connus de LuckPerms. Balaie la table : relevé en fond.");
-		enLigneParGroupe = r.gauge("permission_online_by_group",
-				"Joueurs EN LIGNE par groupe principal. Pour le total hors ligne, voir le module "
-						+ "sql — l'API ne sait pas compter sans tout charger.",
+	public void declare(MetricRegistry r) {
+		groups = r.gauge("permission_groups", "Declared groups.");
+		tracks = r.gauge("permission_tracks", "Declared promotion tracks.");
+		users = r.gauge("permission_users",
+				"Users known to LuckPerms. Scans the table: collected in the background.");
+		onlineByGroup = r.gauge("permission_online_by_group",
+				"Players ONLINE by primary group. For the offline total, see the "
+						+ "sql module — the API can't count without loading everything.",
 				"group");
-		poidsGroupe = r.gauge("permission_group_weight",
-				"Poids d'un groupe, tel que LuckPerms l'utilise pour trancher les conflits.",
+		groupWeight = r.gauge("permission_group_weight",
+				"A group's weight, as LuckPerms uses it to resolve conflicts.",
 				"group");
 	}
 
 	@Override
-	public void relever(MetricRegistry r) throws Exception {
+	public void collect(MetricRegistry r) throws Exception {
 		LuckPerms lp = LuckPermsProvider.get();
 
-		groupes.set(lp.getGroupManager().getLoadedGroups().size());
-		pistes.set(lp.getTrackManager().getLoadedTracks().size());
+		groups.set(lp.getGroupManager().getLoadedGroups().size());
+		tracks.set(lp.getTrackManager().getLoadedTracks().size());
 
-		poidsGroupe.clear();
+		groupWeight.clear();
 		for (Group g : lp.getGroupManager().getLoadedGroups()) {
-			g.getWeight().ifPresent(p -> poidsGroupe.set(p, g.getName()));
+			g.getWeight().ifPresent(p -> groupWeight.set(p, g.getName()));
 		}
 
-		enLigneParGroupe.clear();
-		Map<String, Integer> compte = new HashMap<>();
+		onlineByGroup.clear();
+		Map<String, Integer> count = new HashMap<>();
 		for (User u : lp.getUserManager().getLoadedUsers()) {
-			compte.merge(u.getPrimaryGroup(), 1, Integer::sum);
+			count.merge(u.getPrimaryGroup(), 1, Integer::sum);
 		}
-		compte.forEach((groupe, n) -> enLigneParGroupe.set(n, groupe));
+		count.forEach((group, n) -> onlineByGroup.set(n, group));
 
-		// Le seul appel coûteux, et il est asynchrone par construction. Le délai le borne : une
-		// base lente ne doit pas retenir la tâche de fond jusqu'au relevé suivant.
-		comptes.set(lp.getUserManager().getUniqueUsers().get(20, TimeUnit.SECONDS).size());
+		// The one expensive call, and it's asynchronous by construction. The
+		// timeout bounds it: a slow database shouldn't hold the background task
+		// past the next collection.
+		users.set(lp.getUserManager().getUniqueUsers().get(20, TimeUnit.SECONDS).size());
 	}
 }

@@ -15,17 +15,18 @@ import fr.samflix.vaniametrics.api.VaniaMetricsProvider;
 import fr.samflix.vaniametrics.api.Version;
 
 /**
- * LuckPerms — groupes, pistes, et où se répartissent les joueurs. — côté Velocity.
+ * LuckPerms — groups, tracks, and where players fall. — Velocity side.
  *
- * <p>Même collecteur, autre point d'entrée. Les deux classes cohabitent dans le MÊME jar : Bukkit
- * lit plugin.yml et charge la variante Paper, Velocity lit velocity-plugin.json et charge
- * celle-ci. Chacun ignore l'autre, qui n'est jamais chargée.
+ * <p>Same collector, different entry point. Both classes live in the SAME jar:
+ * Bukkit reads plugin.yml and loads the Paper variant, Velocity reads
+ * velocity-plugin.json and loads this one. Each ignores the other, which is
+ * never loaded.
  */
 @Plugin(
 		id = "vaniametrics-luckperms",
 		name = "VaniaMetrics LuckPerms",
-		version = Version.VALEUR,
-		description = "LuckPerms — groupes, pistes, et où se répartissent les joueurs.",
+		version = Version.VALUE,
+		description = "LuckPerms — groups, tracks, and where players fall.",
 		authors = {"mc-vania"},
 		dependencies = {
 			@Dependency(id = "vaniametrics"),
@@ -33,26 +34,26 @@ import fr.samflix.vaniametrics.api.Version;
 		})
 public final class LuckPermsVelocity {
 
-	private final Logger journal;
-	private Collector collecteur;
+	private final Logger logger;
+	private Collector collector;
 
 	@Inject
-	public LuckPermsVelocity(Logger journal) {
-		this.journal = journal;
+	public LuckPermsVelocity(Logger logger) {
+		this.logger = logger;
 	}
 
 	@Subscribe
 	public void onInit(ProxyInitializeEvent e) {
-		VaniaMetrics metriques = VaniaMetricsProvider.get();
-		collecteur = new LuckPermsCollector(metriques.plateforme());
-		metriques.enregistrer(collecteur);
-		journal.info("collecteur luckperms enregistré");
+		VaniaMetrics metrics = VaniaMetricsProvider.get();
+		collector = new LuckPermsCollector(metrics.platform());
+		metrics.register(collector);
+		logger.info("luckperms collector registered");
 	}
 
 	@Subscribe
 	public void onShutdown(ProxyShutdownEvent e) {
-		if (collecteur != null) {
-			VaniaMetricsProvider.chercher().ifPresent(m -> m.retirer(collecteur));
+		if (collector != null) {
+			VaniaMetricsProvider.find().ifPresent(m -> m.unregister(collector));
 		}
 	}
 }

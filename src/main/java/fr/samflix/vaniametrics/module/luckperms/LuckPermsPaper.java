@@ -7,30 +7,31 @@ import fr.samflix.vaniametrics.api.VaniaMetrics;
 import fr.samflix.vaniametrics.api.VaniaMetricsProvider;
 
 /**
- * LuckPerms — groupes, pistes, et où se répartissent les joueurs.
+ * LuckPerms — groups, tracks, and where players fall.
  *
- * <p>Sur les deux plateformes : son API est la même, et un proxy qui porterait LuckPerms un jour publierait les mêmes chiffres sans qu'on change une ligne.
+ * <p>Same API on both platforms: if a proxy ever ran LuckPerms too, it would
+ * publish the same numbers without changing a line here.
  *
- * <p>SON plugin.yml DÉCLARE {@code depend: [VaniaMetrics, LuckPerms]} : les deux sont
- * indispensables, et le déclarer laisse Bukkit garantir l'ordre de chargement plutôt que de
- * l'espérer. Retirer ce jar retire cette intégration et RIEN D'AUTRE — c'est tout l'intérêt d'un
- * jar par intégration.
+ * <p>Its plugin.yml declares {@code depend: [VaniaMetrics, LuckPerms]}: both
+ * are required, and declaring it lets Bukkit guarantee load order instead of
+ * hoping for it. Removing this jar removes this integration and nothing else
+ * — that's the whole point of one jar per integration.
  */
 public final class LuckPermsPaper extends JavaPlugin {
 
-	private Collector collecteur;
+	private Collector collector;
 
 	@Override
 	public void onEnable() {
-		VaniaMetrics metriques = VaniaMetricsProvider.get();
-		collecteur = new LuckPermsCollector(metriques.plateforme());
-		metriques.enregistrer(collecteur);
+		VaniaMetrics metrics = VaniaMetricsProvider.get();
+		collector = new LuckPermsCollector(metrics.platform());
+		metrics.register(collector);
 	}
 
 	@Override
 	public void onDisable() {
-		if (collecteur != null) {
-			VaniaMetricsProvider.chercher().ifPresent(m -> m.retirer(collecteur));
+		if (collector != null) {
+			VaniaMetricsProvider.find().ifPresent(m -> m.unregister(collector));
 		}
 	}
 }

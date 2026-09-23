@@ -9,3 +9,6 @@ plugins:
   velocity:
     - url: https://cdn.modrinth.com/data/Vebnzrzj/versions/tamnmXad/LuckPerms-Velocity-5.5.71.jar
       sha512: a619da8804727bed7b2b2ee5383974329a3c09181a67745484fdffd0f4b6c5b13c44aa88e0d2b30d13f3068d9b0f3e26863abba9855f80a7eb5f9455ca6c40d4
+  bungee:
+    - url: https://cdn.modrinth.com/data/Vebnzrzj/versions/GzZ3XpCZ/LuckPerms-Bungee-5.5.71.jar
+      sha512: cd7e024f9a17eb780ed2ffe12aa0551434e5c49005d0dacc7bf99733c89876bde439b191b78ccf7c96cfe98feeaae6b1dcae2ddd59ff0905f3b9a83cfac4b46d

@@ -17,10 +17,10 @@ import fr.samflix.vaniametrics.api.Version;
 /**
  * LuckPerms — groups, tracks, and where players fall. — Velocity side.
  *
- * <p>Same collector, different entry point. Both classes live in the SAME jar:
- * Bukkit reads plugin.yml and loads the Paper variant, Velocity reads
- * velocity-plugin.json and loads this one. Each ignores the other, which is
- * never loaded.
+ * <p>Same collector, different entry point. All three classes live in the SAME
+ * jar: Bukkit reads plugin.yml and loads the Paper variant, BungeeCord reads
+ * bungee.yml and loads the Bungee one, Velocity reads velocity-plugin.json and
+ * loads this one. Each ignores the others, which are never loaded.
  */
 @Plugin(
 		id = "vaniametrics-luckperms",

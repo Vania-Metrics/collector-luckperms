@@ -16,3 +16,4 @@ api-version: '1.21'
 authors: [mc-vania]
 description: "LuckPerms metrics: groups, tracks, player distribution."
 depend: [VaniaMetrics, LuckPerms]
+folia-supported: true

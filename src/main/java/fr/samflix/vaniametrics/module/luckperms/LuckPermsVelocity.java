@@ -12,7 +12,6 @@ import com.velocitypowered.api.plugin.Plugin;
 import fr.samflix.vaniametrics.api.Collector;
 import fr.samflix.vaniametrics.api.VaniaMetrics;
 import fr.samflix.vaniametrics.api.VaniaMetricsProvider;
-import fr.samflix.vaniametrics.api.Version;
 
 /**
  * LuckPerms — groups, tracks, and where players fall. — Velocity side.
@@ -25,7 +24,7 @@ import fr.samflix.vaniametrics.api.Version;
 @Plugin(
 		id = "vaniametrics-luckperms",
 		name = "VaniaMetrics LuckPerms",
-		version = Version.VALUE,
+		version = BuildVersion.VALUE,
 		description = "LuckPerms — groups, tracks, and where players fall.",
 		authors = {"mc-vania"},
 		dependencies = {
